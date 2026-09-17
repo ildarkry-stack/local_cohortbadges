@@ -5,6 +5,14 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 namespace local_cohortbadges\local;
 
@@ -47,9 +55,9 @@ final class hook_callbacks {
             return;
         }
 
-        $PAGE->requires->js_call_amd(
-            'local_cohortbadges/participants',
-            'init',
+        $PAGE->requires->js(new \moodle_url('/local/cohortbadges/participants.js'));
+        $PAGE->requires->js_init_call(
+            'localCohortBadgesInit',
             [(int) $PAGE->course->id, get_string('cohortsaria', 'local_cohortbadges')]
         );
     }

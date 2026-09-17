@@ -5,7 +5,7 @@ A small Moodle 5.x local plugin that displays a user's cohort memberships as bad
 ## Features
 
 - Works without modifying Moodle core.
-- Uses Moodle Hooks API and `core/ajax`.
+- Uses Moodle Hooks API and `core/ajax` through Moodle RequireJS.
 - Survives dynamic participant table filtering/pagination.
 - Displays cohort memberships in the standard user profile.
 - Configurable badge text: cohort name, ID number, or both.
@@ -40,7 +40,7 @@ Blocking checks include:
 - Plugin validation
 - Upgrade savepoints
 - Mustache lint
-- Grunt / JavaScript lint
+- Grunt / CSS lint (there are no generated AMD build artefacts)
 - PHPUnit (`--fail-on-warning`)
 
 PHP Mess Detector is also executed as an advisory non-blocking check.
