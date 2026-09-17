@@ -16,39 +16,95 @@
 /**
  * Add cohort badges to the Moodle participants table.
  *
- * This file is loaded through page requirements and uses Moodle's RequireJS
- * loader to obtain core/ajax. Keeping it outside amd/src means there are no
- * generated AMD build artefacts to commit or become stale.
- *
  * @module     local_cohortbadges/participants
  * @copyright  2026 MIA Academy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-window.localCohortBadgesInit = function(courseId, ariaLabel) {
+(function() {
+    'use strict';
+
+    const form = document.querySelector('#participantsform[data-course-id]');
+    const table = document.querySelector('#participants');
+    if (!form || !table) {
+        return;
+    }
+
+    const courseId = Number(form.dataset.courseId || 0);
+    if (!courseId) {
+        return;
+    }
+
+    // Expose a tiny diagnostic marker in the browser console for support.
+    window.localCohortBadgesLoaded = true;
+
     require(['core/ajax'], function(Ajax) {
         const cache = new Map();
-        let observer = null;
         let timer = null;
-        const resolvedCourseId = Number(courseId);
-        const resolvedAriaLabel = ariaLabel || 'Cohorts';
+        let loading = false;
 
-        const getUserId = checkbox => {
-            const match = checkbox.id.match(/^user(\d+)$/);
-            return match ? Number(match[1]) : 0;
-        };
-
-        const getNameCell = row => row.querySelector('th.cell.c1, td.cell.c1')
-            || row.querySelector('th.cell, td.cell');
-
-        const renderBadges = (checkbox, cohorts) => {
-            const row = checkbox.closest('tr');
-            if (!row || row.dataset.cohortbadgesProcessed === '1') {
-                return;
+        /**
+         * Get the user id represented by a participant row.
+         *
+         * @param {HTMLElement} row Participant table row.
+         * @returns {Number}
+         */
+        const getUserId = row => {
+            const checkbox = row.querySelector('input.usercheckbox[id^="user"]');
+            if (checkbox) {
+                const match = checkbox.id.match(/^user(\d+)$/);
+                if (match) {
+                    return Number(match[1]);
+                }
             }
 
-            if (!cohorts.length) {
-                row.dataset.cohortbadgesProcessed = '1';
+            // Fallback for themes which alter the checkbox markup.
+            const profileLink = row.querySelector(
+                'a[href*="/user/view.php?id="], a[href*="/user/profile.php?id="]'
+            );
+            if (!profileLink) {
+                return 0;
+            }
+
+            try {
+                const url = new URL(profileLink.href, window.location.href);
+                return Number(url.searchParams.get('id') || 0);
+            } catch (error) {
+                return 0;
+            }
+        };
+
+        /**
+         * Find the fullname cell without depending on a specific theme column class.
+         *
+         * @param {HTMLElement} row Participant table row.
+         * @returns {HTMLElement|null}
+         */
+        const getNameCell = row => {
+            const profileLink = row.querySelector(
+                'a[href*="/user/view.php?id="], a[href*="/user/profile.php?id="]'
+            );
+            if (profileLink) {
+                return profileLink.closest('th, td');
+            }
+
+            return row.querySelector('th.c1, td.c1, th.cell.c1, td.cell.c1');
+        };
+
+        /**
+         * Render badges for one participant row.
+         *
+         * @param {HTMLElement} row Participant table row.
+         * @param {Array} cohorts Cohort data.
+         */
+        const renderBadges = (row, cohorts) => {
+            const existing = row.querySelector('.local-cohortbadges-list');
+            if (existing) {
+                existing.remove();
+            }
+
+            row.dataset.cohortbadgesProcessed = '1';
+            if (!cohorts || !cohorts.length) {
                 return;
             }
 
@@ -59,7 +115,7 @@ window.localCohortBadgesInit = function(courseId, ariaLabel) {
 
             const list = document.createElement('span');
             list.className = 'local-cohortbadges-list';
-            list.setAttribute('aria-label', resolvedAriaLabel);
+            list.setAttribute('aria-label', 'Глобальные группы');
 
             cohorts.forEach(cohort => {
                 const badge = document.createElement('span');
@@ -70,86 +126,104 @@ window.localCohortBadgesInit = function(courseId, ariaLabel) {
             });
 
             cell.appendChild(list);
-            row.dataset.cohortbadgesProcessed = '1';
         };
 
-        const applyFromCache = () => {
-            document.querySelectorAll('#participants input.usercheckbox[id^="user"]').forEach(checkbox => {
-                const userId = getUserId(checkbox);
-                if (userId && cache.has(userId)) {
-                    renderBadges(checkbox, cache.get(userId));
+        /**
+         * Get current participant rows indexed by user id.
+         *
+         * @returns {Map}
+         */
+        const collectRows = () => {
+            const rows = new Map();
+            table.querySelectorAll('tbody tr').forEach(row => {
+                const userId = getUserId(row);
+                if (userId) {
+                    rows.set(userId, row);
+                }
+            });
+            return rows;
+        };
+
+        /**
+         * Apply any cached memberships to rows currently on screen.
+         */
+        const applyCache = () => {
+            const rows = collectRows();
+            rows.forEach((row, userId) => {
+                if (cache.has(userId)) {
+                    renderBadges(row, cache.get(userId));
                 }
             });
         };
 
-        const scheduleLoad = () => {
-            window.clearTimeout(timer);
-            timer = window.setTimeout(loadMissing, 80);
-        };
-
+        /**
+         * Load missing memberships from Moodle AJAX API.
+         */
         const loadMissing = () => {
+            if (loading) {
+                return;
+            }
+
+            const rows = collectRows();
             const missing = [];
-            document.querySelectorAll('#participants input.usercheckbox[id^="user"]').forEach(checkbox => {
-                const userId = getUserId(checkbox);
-                if (userId && !cache.has(userId) && !missing.includes(userId)) {
+            rows.forEach((row, userId) => {
+                if (!cache.has(userId)) {
                     missing.push(userId);
                 }
             });
 
-            applyFromCache();
+            applyCache();
             if (!missing.length) {
                 return;
             }
 
+            loading = true;
             const requestedUserIds = missing.slice(0, 500);
             const requests = Ajax.call([{
                 methodname: 'local_cohortbadges_get_memberships',
                 args: {
-                    courseid: resolvedCourseId,
+                    courseid: courseId,
                     userids: requestedUserIds,
                 },
             }]);
 
             requests[0].then(result => {
-                result.forEach(entry => cache.set(Number(entry.userid), entry.cohorts || []));
+                result.forEach(entry => {
+                    cache.set(Number(entry.userid), entry.cohorts || []);
+                });
                 requestedUserIds.forEach(userId => {
                     if (!cache.has(userId)) {
                         cache.set(userId, []);
                     }
                 });
-                applyFromCache();
+                applyCache();
+                return null;
+            }).catch(error => {
+                // Do not break the participants page, but leave useful diagnostics.
+                // eslint-disable-next-line no-console
+                console.error('local_cohortbadges: unable to load cohort memberships', error);
+            }).finally(() => {
+                loading = false;
                 if (missing.length > 500) {
                     scheduleLoad();
                 }
-                return null;
-            }).catch(() => {
-                // Keep the standard participants table usable if this optional enhancement cannot load.
             });
         };
 
-        const startObserver = () => {
-            const target = document.querySelector('.userlist')
-                || document.querySelector('#participants')
-                || document.body;
-            observer = new MutationObserver(scheduleLoad);
-            observer.observe(target, {childList: true, subtree: true});
+        /**
+         * Debounce table updates caused by filtering and pagination.
+         */
+        const scheduleLoad = () => {
+            window.clearTimeout(timer);
+            timer = window.setTimeout(loadMissing, 100);
         };
 
-        const run = () => {
-            loadMissing();
-            if (!observer) {
-                startObserver();
-            }
-        };
+        const observer = new MutationObserver(scheduleLoad);
+        observer.observe(table.parentElement || table, {
+            childList: true,
+            subtree: true,
+        });
 
-        if (!resolvedCourseId) {
-            return;
-        }
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', run, {once: true});
-        } else {
-            run();
-        }
+        loadMissing();
     });
-};
+})();

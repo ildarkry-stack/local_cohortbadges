@@ -21,3 +21,8 @@
 - Configurable badge format and hidden-cohort visibility.
 - GitHub Actions CI for Moodle 5.0, 5.1, and 5.2.
 - PHPUnit coverage for cohort label formatting.
+
+## 1.0.3 - 2026-09-17
+- Load the participants enhancer from the footer hook after the table exists.
+- Make participant/user detection independent from theme-specific table cell classes.
+- Add browser console diagnostics when the AJAX request fails.

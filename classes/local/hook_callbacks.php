@@ -16,7 +16,7 @@
 
 namespace local_cohortbadges\local;
 
-use core\hook\output\before_standard_head_html_generation;
+use core\hook\output\before_standard_footer_html_generation;
 
 /**
  * Output hook callbacks.
@@ -27,13 +27,16 @@ use core\hook\output\before_standard_head_html_generation;
  */
 final class hook_callbacks {
     /**
-     * Load the participants page enhancer when appropriate.
+     * Load the participants page enhancer in the footer.
      *
-     * @param before_standard_head_html_generation $hook Hook instance.
+     * Loading the script here guarantees that the participants table has already
+     * been rendered before the enhancement starts.
+     *
+     * @param before_standard_footer_html_generation $hook Hook instance.
      * @return void
      */
-    public static function before_standard_head_html_generation(
-        before_standard_head_html_generation $hook
+    public static function before_standard_footer_html_generation(
+        before_standard_footer_html_generation $hook
     ): void {
         global $PAGE;
 
@@ -55,10 +58,11 @@ final class hook_callbacks {
             return;
         }
 
-        $PAGE->requires->js(new \moodle_url('/local/cohortbadges/participants.js'));
-        $PAGE->requires->js_init_call(
-            'localCohortBadgesInit',
-            [(int) $PAGE->course->id, get_string('cohortsaria', 'local_cohortbadges')]
-        );
+        $url = new \moodle_url('/local/cohortbadges/participants.js', [
+            'v' => '2026091703',
+        ]);
+        $hook->add_html(\html_writer::tag('script', '', [
+            'src' => $url->out(false),
+        ]));
     }
 }
