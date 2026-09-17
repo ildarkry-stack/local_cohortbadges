@@ -1,12 +1,3 @@
-.local-cohortbadges-list {
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: .25rem;
-    margin-left: .4rem;
-    vertical-align: middle;
-}
-
-.local-cohortbadges-badge,
 .local-cohortbadges-profile-badge {
     font-size: .72rem;
     font-weight: 500;

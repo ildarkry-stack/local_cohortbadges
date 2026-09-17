@@ -24,13 +24,4 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$functions = [
-    'local_cohortbadges_get_memberships' => [
-        'classname' => 'local_cohortbadges\\external\\get_memberships',
-        'methodname' => 'execute',
-        'description' => 'Returns cohort memberships for users visible in a course participants table.',
-        'type' => 'read',
-        'ajax' => true,
-        'capabilities' => 'local/cohortbadges:view',
-    ],
-];
+$functions = [];
