@@ -1,0 +1,72 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+namespace local_cohortbadges;
+
+use local_cohortbadges\local\membership_manager;
+
+/**
+ * Tests for the cohort membership manager.
+ *
+ * @package    local_cohortbadges
+ * @copyright  2026 MIA Academy
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \local_cohortbadges\local\membership_manager
+ */
+final class membership_manager_test extends \advanced_testcase {
+    /**
+     * The cohort name is used by default.
+     *
+     * @return void
+     */
+    public function test_format_label_defaults_to_name(): void {
+        $this->resetAfterTest();
+        unset_config('displayformat', 'local_cohortbadges');
+
+        $this->assertSame('Students 2026', membership_manager::format_label('Students 2026', 'ST26'));
+    }
+
+    /**
+     * The ID number format falls back to the cohort name when no ID number exists.
+     *
+     * @return void
+     */
+    public function test_format_label_idnumber_falls_back_to_name(): void {
+        $this->resetAfterTest();
+        set_config('displayformat', 'idnumber', 'local_cohortbadges');
+
+        $this->assertSame('Students 2026', membership_manager::format_label('Students 2026', ''));
+    }
+
+    /**
+     * The ID number format returns the ID number when it exists.
+     *
+     * @return void
+     */
+    public function test_format_label_uses_idnumber(): void {
+        $this->resetAfterTest();
+        set_config('displayformat', 'idnumber', 'local_cohortbadges');
+
+        $this->assertSame('ST26', membership_manager::format_label('Students 2026', 'ST26'));
+    }
+
+    /**
+     * The combined format contains both the cohort name and ID number.
+     *
+     * @return void
+     */
+    public function test_format_label_uses_name_and_idnumber(): void {
+        $this->resetAfterTest();
+        set_config('displayformat', 'nameandidnumber', 'local_cohortbadges');
+
+        $this->assertSame(
+            'Students 2026 (ST26)',
+            membership_manager::format_label('Students 2026', 'ST26')
+        );
+    }
+}
