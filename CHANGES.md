@@ -1,5 +1,13 @@
 # Change log
 
+## 1.0.6 - 2026-09-17
+
+- Prepared the plugin for public Marketplace release.
+- Removed obsolete empty hook and external-service definition files.
+- Removed bundled non-English language pack; translations should be maintained through Moodle AMOS after publication.
+- Updated English privacy string to use a single supported language-string assignment.
+- Expanded installation, configuration, privacy, permissions, and support documentation.
+
 ## 1.0.5 - 2026-09-17
 
 - Removed cohort badges from the Course > Participants table.

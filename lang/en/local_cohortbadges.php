@@ -33,12 +33,10 @@ $string['format_idnumber'] = 'Cohort ID number';
 $string['format_name'] = 'Cohort name';
 $string['format_nameandidnumber'] = 'Name and ID number';
 $string['nameandidnumberformat'] = '{$a->name} ({$a->idnumber})';
-$string['pluginname'] = 'Cohort memberships';
-$string['privacy:metadata'] = 'The Cohort badges plugin does not store personal data. '
-    . 'It only displays existing Moodle cohort membership information.';
-$string['profileheading'] = 'Global groups';
+$string['pluginname'] = 'Cohort memberships in profile';
+$string['privacy:metadata'] = 'The Cohort memberships plugin does not store personal data. It only displays existing Moodle cohort membership information.';
+$string['profileheading'] = 'Cohort memberships';
 $string['showhidden'] = 'Show hidden cohorts';
-$string['showhidden_desc'] = 'If enabled, hidden cohorts are also displayed to users who have permission '
-    . 'to view this information.';
+$string['showhidden_desc'] = 'If enabled, hidden cohorts are also displayed to users who have permission to view this information.';
 $string['showinprofile'] = 'Show in user profile';
 $string['showinprofile_desc'] = 'Show cohort memberships in the standard Moodle user profile.';
