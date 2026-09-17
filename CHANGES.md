@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2 - 2026-09-17
+
+- Fixed Moodle GPL boilerplate formatting in all PHP files for CodeSniffer compliance.
+- Updated GPL URL to the canonical HTTPS form expected by Moodle coding standards.
+
 ## 1.0.1 - 2026-09-17
 
 - Fixed Moodle CodeSniffer boilerplate and PSR-12 issues reported by GitHub Actions.
