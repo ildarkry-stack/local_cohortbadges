@@ -1,5 +1,11 @@
 # Change log
 
+## 1.0.7 - 2026-10-12
+
+- Included the complete, unmodified GNU GPL v3 licence text in `LICENSE` to address Moodle Marketplace review MMR-293.
+- Added direct public source repository and plugin-specific issue tracker links to the README.
+- No runtime behaviour or database schema changes.
+
 ## 1.0.6 - 2026-09-17
 
 - Prepared the plugin for public Marketplace release.
