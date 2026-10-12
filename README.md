@@ -72,8 +72,14 @@ None beyond Moodle core.
 
 ## Support and issues
 
-Please use the public issue tracker linked from the Moodle Marketplace listing or the project's GitHub Issues page.
+Report bugs and suggest improvements in the public, plugin-specific issue tracker:
+
+https://github.com/ildarkry-stack/local_cohortbadges/issues
+
+Public source code repository:
+
+https://github.com/ildarkry-stack/local_cohortbadges
 
 ## License
 
-GNU GPL v3 or later.
+GNU GPL v3 or later. See the full licence text in [LICENSE](LICENSE).
