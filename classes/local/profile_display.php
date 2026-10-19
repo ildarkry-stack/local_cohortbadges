@@ -50,25 +50,12 @@ final class profile_display {
         }
 
         $userid = (int) $user->id;
-        $cohorts = [];
-        if ($canview) {
-            $memberships = membership_manager::get_memberships([$userid]);
-            $cohorts = $memberships[$userid] ?? [];
-        }
+        $cohorts = self::load_memberships($userid, $canview);
         if (!$cohorts && !$canmanage) {
             return;
         }
 
-        $mode = $canmanage ? 'manage' : 'read';
-        $usages = [];
-        $showcourses = get_config('local_cohortbadges', 'showcohortcourses');
-        if ($canview && ($showcourses === false || (bool) $showcourses) && $cohorts) {
-            $usages = cohort_usage::get_course_usages(array_column($cohorts, 'id'));
-        }
-        $content = self::render_badges($cohorts, $userid, $mode, $usages);
-        if ($canmanage) {
-            $content .= self::render_manage_button($userid);
-        }
+        $content = self::render_content($cohorts, $userid, $canmanage, $canview);
 
         $node = new \core_user\output\myprofile\node(
             'miscellaneous',
@@ -79,6 +66,58 @@ final class profile_display {
             $content
         );
         $tree->add_node($node);
+    }
+
+    /**
+     * Retrieve existing cohort membership badges if profile viewing is permitted.
+     *
+     * @param int $userid Profile user identifier.
+     * @param bool $canview Whether membership labels may be shown.
+     * @return array
+     */
+    private static function load_memberships(int $userid, bool $canview): array {
+        if (!$canview) {
+            return [];
+        }
+        $memberships = membership_manager::get_memberships([$userid]);
+        return $memberships[$userid] ?? [];
+    }
+
+    /**
+     * Build profile content including optional management and read-only course usage.
+     *
+     * @param array $cohorts Current visible memberships.
+     * @param int $userid Profile owner identifier.
+     * @param bool $canmanage Whether membership may be edited.
+     * @param bool $canview Whether membership labels may be shown.
+     * @return string
+     */
+    private static function render_content(array $cohorts, int $userid, bool $canmanage, bool $canview): string {
+        $mode = $canmanage ? 'manage' : 'read';
+        $usages = self::load_course_usages($cohorts, $canview);
+        $content = self::render_badges($cohorts, $userid, $mode, $usages);
+        if ($canmanage) {
+            $content .= self::render_manage_button($userid);
+        }
+        return $content;
+    }
+
+    /**
+     * Load all cohort sync course instances with a single database query.
+     *
+     * @param array $cohorts Current visible memberships.
+     * @param bool $canview Whether membership labels may be shown.
+     * @return array
+     */
+    private static function load_course_usages(array $cohorts, bool $canview): array {
+        if (!$canview || !$cohorts) {
+            return [];
+        }
+        $setting = get_config('local_cohortbadges', 'showcohortcourses');
+        if ($setting !== false && !(bool) $setting) {
+            return [];
+        }
+        return cohort_usage::get_course_usages(array_column($cohorts, 'id'));
     }
 
     /**
@@ -199,6 +238,7 @@ final class profile_display {
             'local-cohortbadges-profile-manage'
         );
     }
+
     /**
      * Display a collapsible list of courses that use this cohort for enrolment.
      *
@@ -213,7 +253,8 @@ final class profile_display {
             $url = new \moodle_url('/course/view.php', ['id' => $course['id']]);
             $statuskey = $course['enabled'] ? 'syncenabled' : 'syncdisabled';
             $label = get_string($statuskey, 'local_cohortbadges');
-            $items[] = \html_writer::tag('li',
+            $items[] = \html_writer::tag(
+                'li',
                 \html_writer::link($url, $name) . ' — ' . s($label)
             );
         }
@@ -228,5 +269,4 @@ final class profile_display {
             ['class' => 'local-cohortbadges-sync-courses']
         );
     }
-
 }
