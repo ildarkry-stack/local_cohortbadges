@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_cohortbadges';
-$plugin->version = 2026101200;
+$plugin->version = 2026101900;
 $plugin->requires = 2025041400;
 $plugin->supported = [500, 502];
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '1.0.7';
+$plugin->maturity = MATURITY_BETA;
+$plugin->release = '1.1.0-beta.1';

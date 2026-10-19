@@ -2,11 +2,13 @@
 
 Cohort memberships is a lightweight local plugin for Moodle 5.x that displays a user's existing cohort memberships in the standard Moodle user profile.
 
-The plugin is read-only. It does not create, edit, enrol, or synchronise cohorts and it does not modify Moodle core.
+The plugin displays cohort memberships without modifying Moodle core. An **optional, disabled-by-default** management feature lets authorised staff change membership of manually managed cohorts from a link in the user's standard profile. When management is disabled, the original read-only behaviour is preserved.
 
 ## Features
 
 - Displays cohort memberships in the standard user profile.
+- Optionally shows a profile link to manage that user's cohort memberships.
+- Allows authorised staff to search for cohorts and add/remove an existing user via Moodle core Cohort API.
 - Configurable label format: cohort name, cohort ID number, or both.
 - Hidden cohorts are excluded by default.
 - Users can view their own cohort memberships.
@@ -51,6 +53,7 @@ Available settings:
 - Choose the displayed label format: cohort name, ID number, or both.
 - Choose whether hidden cohorts may be included.
 - Enable or disable display in user profiles.
+- Enable or disable cohort membership management (off by default).
 
 ## Permissions
 
@@ -62,9 +65,13 @@ local/cohortbadges:view
 
 It is available at course context and is allowed by default for managers, editing teachers, and teachers. Users can always see their own cohort memberships. When a profile is viewed outside a course context, Moodle's standard `moodle/cohort:view` capability is used.
 
+**Write permissions:** When enabled by a site administrator, the management link opens a page that requires the built-in `moodle/cohort:assign` capability **in each cohort's own context**. Category-level cohort managers are supported. The plugin does not grant any role additional permissions. Cohorts managed by external components (non-empty `component`) cannot be edited. All changes require a session-key-checked POST; removal also requires confirmation. The plugin does not create, delete, or rename cohorts.
+
+**Important:** Adding/removing a cohort member can affect course access if cohort enrolment synchronisation is configured. Membership changes use Moodle core events and APIs, not direct database writes.
+
 ## Privacy
 
-The plugin does not create its own personal-data tables and does not send data to external services. It reads existing Moodle cohort membership information and displays it in the user profile. A Moodle Privacy API null provider is included.
+The plugin does not create its own personal-data tables and does not send data to external services. It reads existing Moodle cohort membership information and optionally changes Moodle core cohort memberships. No personal data is stored in plugin-owned tables; standard Moodle events record membership changes. A Moodle Privacy API null provider is included.
 
 ## Dependencies
 

@@ -24,18 +24,31 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['addtocohort'] = 'Add to a cohort';
+$string['allowmanagement'] = 'Enable cohort membership management';
+$string['allowmanagement_desc'] = 'Allow authorised staff to add or remove existing users from manually managed cohorts directly from their profiles. Disabled by default. Changes may affect cohort-synchronised course enrolments.';
+$string['backtoprofile'] = 'Back to user profile';
 $string['cohortbadges:view'] = 'View user cohort membership information';
+$string['confirmremove'] = 'Remove {$a->user} from cohort {$a->cohort}? Cohort synchronisation may revoke their course enrolments.';
+$string['currentmemberships'] = 'Current editable memberships';
 $string['displayformat'] = 'Badge text';
 $string['displayformat_desc'] = 'Choose what is displayed for each cohort membership.';
 $string['enabled'] = 'Enable cohort membership display';
 $string['enabled_desc'] = 'Show cohort membership information in the user profile.';
+$string['externallymanaged'] = 'This cohort is managed by another component and cannot be edited here.';
 $string['format_idnumber'] = 'Cohort ID number';
 $string['format_name'] = 'Cohort name';
 $string['format_nameandidnumber'] = 'Name and ID number';
+$string['managecohorts'] = 'Manage cohort memberships';
+$string['managementdisabled'] = 'Cohort membership management is disabled in plugin settings.';
+$string['membershipupdated'] = 'Cohort membership updated.';
 $string['nameandidnumberformat'] = '{$a->name} ({$a->idnumber})';
+$string['noavailablecohorts'] = 'No matching assignable cohorts were found.';
+$string['noeditablememberships'] = 'No manually managed cohort memberships can be edited with your permissions.';
 $string['pluginname'] = 'Cohort memberships in profile';
-$string['privacy:metadata'] = 'The Cohort memberships plugin does not store personal data. It only displays existing Moodle cohort membership information.';
+$string['privacy:metadata'] = 'The plugin reads existing Moodle cohort membership data and may change membership using Moodle core when enabled. It stores no personal data itself.';
 $string['profileheading'] = 'Cohort memberships';
+$string['searchcohorts'] = 'Find a cohort by name, ID number, or numeric ID';
 $string['showhidden'] = 'Show hidden cohorts';
 $string['showhidden_desc'] = 'If enabled, hidden cohorts are also displayed to users who have permission to view this information.';
 $string['showinprofile'] = 'Show in user profile';

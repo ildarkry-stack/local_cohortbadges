@@ -60,5 +60,12 @@ if ($hassiteconfig) {
         1
     ));
 
+    $settings->add(new admin_setting_configcheckbox(
+        'local_cohortbadges/allowmanagement',
+        get_string('allowmanagement', 'local_cohortbadges'),
+        get_string('allowmanagement_desc', 'local_cohortbadges'),
+        0
+    ));
+
     $ADMIN->add('localplugins', $settings);
 }

@@ -54,14 +54,20 @@ function local_cohortbadges_myprofile_navigation(
         $canview = $canview || has_capability('moodle/cohort:view', context_system::instance());
     }
 
-    if (!$canview) {
+    $canmanage = \local_cohortbadges\local\cohort_management::enabled()
+        && (has_capability('moodle/cohort:assign', context_system::instance())
+            || \core_course_category::has_capability_on_any('moodle/cohort:assign'));
+    if (!$canview && !$canmanage) {
         return;
     }
 
     $showhidden = (bool) get_config('local_cohortbadges', 'showhidden');
-    $memberships = \local_cohortbadges\local\membership_manager::get_memberships([(int) $user->id], $showhidden);
-    $cohorts = $memberships[(int) $user->id] ?? [];
-    if (!$cohorts) {
+    $cohorts = [];
+    if ($canview) {
+        $memberships = \local_cohortbadges\local\membership_manager::get_memberships([(int) $user->id], $showhidden);
+        $cohorts = $memberships[(int) $user->id] ?? [];
+    }
+    if (!$cohorts && !$canmanage) {
         return;
     }
 
@@ -73,6 +79,15 @@ function local_cohortbadges_myprofile_navigation(
         );
     }
     $content = html_writer::div(implode(' ', $labels), 'local-cohortbadges-profile-list');
+    if ($canmanage) {
+        $url = new moodle_url('/local/cohortbadges/manage.php', ['userid' => (int) $user->id]);
+        $content .= html_writer::div(
+            html_writer::link($url, get_string('managecohorts', 'local_cohortbadges'), [
+                'class' => 'btn btn-secondary btn-sm',
+            ]),
+            'local-cohortbadges-profile-manage'
+        );
+    }
 
     $node = new core_user\output\myprofile\node(
         'miscellaneous',
