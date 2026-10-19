@@ -67,5 +67,12 @@ if ($hassiteconfig) {
         0
     ));
 
+    $settings->add(new admin_setting_configcheckbox(
+        'local_cohortbadges/showcohortcourses',
+        get_string('showcohortcourses', 'local_cohortbadges'),
+        get_string('showcohortcourses_desc', 'local_cohortbadges'),
+        1
+    ));
+
     $ADMIN->add('localplugins', $settings);
 }

@@ -1,5 +1,14 @@
 # Change log
 
+## 1.1.0-beta.3 - 2026-10-19
+
+- Show a read-only, collapsible list of courses that configure cohort sync for each cohort shown in the user profile.
+- Report enabled and disabled enrolment instances, consolidating multiple instances per course.
+- Protect course metadata with cohort-level view/assign and course-level enrol/cohort:config capabilities.
+- Exclude hidden courses unless the viewer is authorised to view hidden courses.
+- Query cohort enrolment instances in one batch to avoid per-cohort database queries.
+- Added an administrator setting to control this display independently from cohort membership editing.
+
 ## 1.1.0-beta.2 - 2026-10-19
 
 - Split the profile callback into focused rendering and permission helpers.

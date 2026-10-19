@@ -60,7 +60,12 @@ final class profile_display {
         }
 
         $mode = $canmanage ? 'manage' : 'read';
-        $content = self::render_badges($cohorts, $userid, $mode);
+        $usages = [];
+        $showcourses = get_config('local_cohortbadges', 'showcohortcourses');
+        if ($canview && ($showcourses === false || (bool) $showcourses) && $cohorts) {
+            $usages = cohort_usage::get_course_usages(array_column($cohorts, 'id'));
+        }
+        $content = self::render_badges($cohorts, $userid, $mode, $usages);
         if ($canmanage) {
             $content .= self::render_manage_button($userid);
         }
@@ -127,12 +132,13 @@ final class profile_display {
      * @param array $cohorts Existing cohort memberships.
      * @param int $userid Profile owner identifier.
      * @param string $mode Either read or manage.
+     * @param array $usages Visible cohort sync course mappings.
      * @return string
      */
-    private static function render_badges(array $cohorts, int $userid, string $mode): string {
+    private static function render_badges(array $cohorts, int $userid, string $mode, array $usages): string {
         $labels = [];
         foreach ($cohorts as $cohort) {
-            $labels[] = self::render_badge($cohort, $userid, $mode);
+            $labels[] = self::render_badge($cohort, $userid, $mode, $usages);
         }
         return \html_writer::div(implode(' ', $labels), 'local-cohortbadges-profile-list');
     }
@@ -143,9 +149,10 @@ final class profile_display {
      * @param array $cohort Cohort membership record.
      * @param int $userid Profile owner identifier.
      * @param string $mode Either read or manage.
+     * @param array $usages Visible cohort sync course mappings.
      * @return string
      */
-    private static function render_badge(array $cohort, int $userid, string $mode): string {
+    private static function render_badge(array $cohort, int $userid, string $mode, array $usages): string {
         $badge = \html_writer::span(
             s($cohort['label']),
             'badge rounded-pill text-bg-secondary local-cohortbadges-profile-badge'
@@ -167,7 +174,14 @@ final class profile_display {
             ]);
         }
 
-        return \html_writer::span($badge, 'local-cohortbadges-profile-item');
+        $content = \html_writer::div($badge, 'local-cohortbadges-profile-item');
+        $showcourses = get_config('local_cohortbadges', 'showcohortcourses');
+        if ($showcourses === false || (bool) $showcourses) {
+            if (cohort_usage::can_view_cohort((int) $cohort['contextid'])) {
+                $content .= self::render_cohort_courses($usages[$cohort['id']] ?? []);
+            }
+        }
+        return \html_writer::div($content, 'local-cohortbadges-profile-cohort');
     }
 
     /**
@@ -185,4 +199,34 @@ final class profile_display {
             'local-cohortbadges-profile-manage'
         );
     }
+    /**
+     * Display a collapsible list of courses that use this cohort for enrolment.
+     *
+     * @param array $courses Visible and grouped cohort-sync instances.
+     * @return string
+     */
+    private static function render_cohort_courses(array $courses): string {
+        $items = [];
+        foreach ($courses as $course) {
+            $context = \context_course::instance((int) $course['id']);
+            $name = format_string($course['fullname'], true, ['context' => $context]);
+            $url = new \moodle_url('/course/view.php', ['id' => $course['id']]);
+            $statuskey = $course['enabled'] ? 'syncenabled' : 'syncdisabled';
+            $label = get_string($statuskey, 'local_cohortbadges');
+            $items[] = \html_writer::tag('li',
+                \html_writer::link($url, $name) . ' — ' . s($label)
+            );
+        }
+        if (!$items) {
+            $items[] = \html_writer::tag('li', get_string('nocohortcourses', 'local_cohortbadges'));
+        }
+        $summary = get_string('cohortcoursescount', 'local_cohortbadges', count($courses));
+        return \html_writer::tag(
+            'details',
+            \html_writer::tag('summary', $summary)
+                . \html_writer::tag('ul', implode('', $items)),
+            ['class' => 'local-cohortbadges-sync-courses']
+        );
+    }
+
 }
