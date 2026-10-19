@@ -4,6 +4,7 @@
 
 - Added optional, disabled-by-default profile entry point to cohort membership management.
 - Added paginated search by cohort name, ID number, or numeric ID and add/remove actions using core Cohort API.
+- Added a direct remove action alongside eligible profile badges (opens a confirmation page).
 - Enforced context-specific `moodle/cohort:assign`, POST sesskey, and removal confirmation.
 - Excluded externally managed cohorts from manual changes.
 - Kept existing badge rendering and Privacy API, without custom database tables.

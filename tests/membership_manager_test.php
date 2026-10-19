@@ -77,4 +77,30 @@ final class membership_manager_test extends \advanced_testcase {
             membership_manager::format_label('Students 2026', 'ST26')
         );
     }
+    /**
+     * Membership metadata supports safe permission checks for profile quick actions.
+     *
+     * @return void
+     */
+    public function test_memberships_include_context_and_component_metadata(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        require_once($CFG->dirroot . '/cohort/lib.php');
+
+        $userid = $this->getDataGenerator()->create_user()->id;
+        $contextid = \context_system::instance()->id;
+        $cohortid = cohort_add_cohort((object) [
+            'name' => 'Quick action cohort',
+            'contextid' => $contextid,
+        ]);
+        cohort_add_member($cohortid, $userid);
+
+        $memberships = membership_manager::get_memberships([$userid]);
+        $this->assertCount(1, $memberships[$userid]);
+        $this->assertSame($cohortid, $memberships[$userid][0]['id']);
+        $this->assertSame($contextid, $memberships[$userid][0]['contextid']);
+        $this->assertSame('', $memberships[$userid][0]['component']);
+    }
 }

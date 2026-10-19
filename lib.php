@@ -73,10 +73,25 @@ function local_cohortbadges_myprofile_navigation(
 
     $labels = [];
     foreach ($cohorts as $cohort) {
-        $labels[] = html_writer::span(
+        $badge = html_writer::span(
             s($cohort['label']),
             'badge rounded-pill text-bg-secondary local-cohortbadges-profile-badge'
         );
+        if ($canmanage && empty($cohort['component'])) {
+            $context = context::instance_by_id((int) $cohort['contextid'], IGNORE_MISSING);
+            if ($context && has_capability('moodle/cohort:assign', $context)) {
+                $removeurl = new moodle_url('/local/cohortbadges/manage.php', [
+                    'userid' => (int) $user->id,
+                    'cohortid' => (int) $cohort['id'],
+                    'action' => 'remove',
+                ]);
+                $badge .= html_writer::link($removeurl, get_string('remove'), [
+                    'class' => 'local-cohortbadges-profile-remove',
+                    'aria-label' => get_string('removefromcohort', 'local_cohortbadges', $cohort['name']),
+                ]);
+            }
+        }
+        $labels[] = html_writer::span($badge, 'local-cohortbadges-profile-item');
     }
     $content = html_writer::div(implode(' ', $labels), 'local-cohortbadges-profile-list');
     if ($canmanage) {

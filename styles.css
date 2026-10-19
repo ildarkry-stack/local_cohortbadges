@@ -31,3 +31,13 @@
 .local-cohortbadges-search input[type="search"] {
     flex: 1 1 18rem;
 }
+
+.local-cohortbadges-profile-item {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+}
+
+.local-cohortbadges-profile-remove {
+    font-size: .72rem;
+}

@@ -46,7 +46,7 @@ final class membership_manager {
 
         [$insql, $params] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'uid');
         $visibilitysql = $showhidden ? '' : ' AND c.visible = 1';
-        $sql = "SELECT cm.id, cm.userid, c.id AS cohortid, c.contextid, c.name, c.idnumber, c.visible
+        $sql = "SELECT cm.id, cm.userid, c.id AS cohortid, c.contextid, c.name, c.idnumber, c.visible, c.component
                   FROM {cohort_members} cm
                   JOIN {cohort} c ON c.id = cm.cohortid
                  WHERE cm.userid {$insql}{$visibilitysql}
@@ -64,6 +64,8 @@ final class membership_manager {
                 'name' => $name,
                 'idnumber' => (string) $record->idnumber,
                 'visible' => (bool) $record->visible,
+                'contextid' => (int) $record->contextid,
+                'component' => (string) $record->component,
                 'label' => self::format_label($name, (string) $record->idnumber),
             ];
         }

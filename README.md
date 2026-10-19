@@ -7,7 +7,7 @@ The plugin displays cohort memberships without modifying Moodle core. An **optio
 ## Features
 
 - Displays cohort memberships in the standard user profile.
-- Optionally shows a profile link to manage that user's cohort memberships.
+- Optionally shows a profile link to manage that user's cohort memberships and remove actions beside editable cohort badges.
 - Allows authorised staff to search for cohorts and add/remove an existing user via Moodle core Cohort API.
 - Configurable label format: cohort name, cohort ID number, or both.
 - Hidden cohorts are excluded by default.

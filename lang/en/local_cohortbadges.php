@@ -48,6 +48,7 @@ $string['noeditablememberships'] = 'No manually managed cohort memberships can b
 $string['pluginname'] = 'Cohort memberships in profile';
 $string['privacy:metadata'] = 'The plugin reads existing Moodle cohort membership data and may change membership using Moodle core when enabled. It stores no personal data itself.';
 $string['profileheading'] = 'Cohort memberships';
+$string['removefromcohort'] = 'Remove from cohort {$a}';
 $string['searchcohorts'] = 'Find a cohort by name, ID number, or numeric ID';
 $string['showhidden'] = 'Show hidden cohorts';
 $string['showhidden_desc'] = 'If enabled, hidden cohorts are also displayed to users who have permission to view this information.';
