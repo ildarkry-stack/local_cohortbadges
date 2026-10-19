@@ -28,10 +28,9 @@ final class membership_manager {
      * Get cohort memberships indexed by user id.
      *
      * @param int[] $userids User ids.
-     * @param bool $showhidden Whether hidden cohorts should be included.
      * @return array<int, array<int, array<string, mixed>>>
      */
-    public static function get_memberships(array $userids, bool $showhidden = false): array {
+    public static function get_memberships(array $userids): array {
         global $DB;
 
         $userids = array_values(array_unique(array_filter(array_map('intval', $userids))));
@@ -45,6 +44,7 @@ final class membership_manager {
         }
 
         [$insql, $params] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'uid');
+        $showhidden = (bool) get_config('local_cohortbadges', 'showhidden');
         $visibilitysql = $showhidden ? '' : ' AND c.visible = 1';
         $sql = "SELECT cm.id, cm.userid, c.id AS cohortid, c.contextid, c.name, c.idnumber, c.visible, c.component
                   FROM {cohort_members} cm

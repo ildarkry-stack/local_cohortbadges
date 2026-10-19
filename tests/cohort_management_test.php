@@ -24,8 +24,8 @@ use local_cohortbadges\local\cohort_management;
  * @package    local_cohortbadges
  * @copyright  2026 MIA Academy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_cohortbadges\local\cohort_management
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_cohortbadges\local\cohort_management::class)]
 final class cohort_management_test extends \advanced_testcase {
     /**
      * Management is opt-in, including for administrators.

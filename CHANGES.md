@@ -1,5 +1,12 @@
 # Change log
 
+## 1.1.0-beta.2 - 2026-10-19
+
+- Split the profile callback into focused rendering and permission helpers.
+- Removed the boolean-flag argument from membership queries; visibility now follows the plugin setting.
+- Migrated PHPUnit test coverage metadata from deprecated docblock annotations to PHP 8 attributes.
+- Kept the original read-only display, optional write protections, and standard Moodle cohort API unchanged.
+
 ## 1.1.0-beta.1 - 2026-10-19
 
 - Added optional, disabled-by-default profile entry point to cohort membership management.
