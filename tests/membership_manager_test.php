@@ -77,6 +77,7 @@ final class membership_manager_test extends \advanced_testcase {
             membership_manager::format_label('Students 2026', 'ST26')
         );
     }
+
     /**
      * Membership metadata supports safe permission checks for profile quick actions.
      *
