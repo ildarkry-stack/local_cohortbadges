@@ -11,3 +11,33 @@
     flex-wrap: wrap;
     gap: .35rem;
 }
+
+.local-cohortbadges-profile-manage {
+    margin-top: .65rem;
+}
+
+.local-cohortbadges-search {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: .5rem;
+    margin: 1rem 0;
+}
+
+.local-cohortbadges-search label {
+    flex-basis: 100%;
+}
+
+.local-cohortbadges-search input[type="search"] {
+    flex: 1 1 18rem;
+}
+
+.local-cohortbadges-profile-item {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+}
+
+.local-cohortbadges-profile-remove {
+    font-size: .72rem;
+}

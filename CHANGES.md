@@ -1,5 +1,23 @@
 # Change log
 
+## 1.1.0-beta.2 - 2026-10-19
+
+- Split the profile callback into focused rendering and permission helpers.
+- Removed the boolean-flag argument from membership queries; visibility now follows the plugin setting.
+- Migrated PHPUnit test coverage metadata from deprecated docblock annotations to PHP 8 attributes.
+- Kept the original read-only display, optional write protections, and standard Moodle cohort API unchanged.
+
+## 1.1.0-beta.1 - 2026-10-19
+
+- Added optional, disabled-by-default profile entry point to cohort membership management.
+- Added paginated search by cohort name, ID number, or numeric ID and add/remove actions using core Cohort API.
+- Added a direct remove action alongside eligible profile badges (opens a confirmation page).
+- Enforced context-specific `moodle/cohort:assign`, POST sesskey, and removal confirmation.
+- Excluded externally managed cohorts from manual changes.
+- Kept existing badge rendering and Privacy API, without custom database tables.
+- Added regression tests for membership changes, permissions, and external cohorts.
+- This is a beta candidate pending full GitHub Moodle CI checks.
+
 ## 1.0.7 - 2026-10-12
 
 - Included the complete, unmodified GNU GPL v3 licence text in `LICENSE` to address Moodle Marketplace review MMR-293.

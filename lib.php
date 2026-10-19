@@ -37,50 +37,6 @@ function local_cohortbadges_myprofile_navigation(
     bool $iscurrentuser,
     $course
 ): void {
-    $enabled = get_config('local_cohortbadges', 'enabled');
-    $showinprofile = get_config('local_cohortbadges', 'showinprofile');
-    if (
-        ($enabled !== false && !(bool) $enabled)
-        || ($showinprofile !== false && !(bool) $showinprofile)
-    ) {
-        return;
-    }
-
-    $canview = $iscurrentuser;
-    if ($course && !empty($course->id)) {
-        $context = context_course::instance((int) $course->id, IGNORE_MISSING);
-        $canview = $canview || ($context && has_capability('local/cohortbadges:view', $context));
-    } else {
-        $canview = $canview || has_capability('moodle/cohort:view', context_system::instance());
-    }
-
-    if (!$canview) {
-        return;
-    }
-
-    $showhidden = (bool) get_config('local_cohortbadges', 'showhidden');
-    $memberships = \local_cohortbadges\local\membership_manager::get_memberships([(int) $user->id], $showhidden);
-    $cohorts = $memberships[(int) $user->id] ?? [];
-    if (!$cohorts) {
-        return;
-    }
-
-    $labels = [];
-    foreach ($cohorts as $cohort) {
-        $labels[] = html_writer::span(
-            s($cohort['label']),
-            'badge rounded-pill text-bg-secondary local-cohortbadges-profile-badge'
-        );
-    }
-    $content = html_writer::div(implode(' ', $labels), 'local-cohortbadges-profile-list');
-
-    $node = new core_user\output\myprofile\node(
-        'miscellaneous',
-        'local_cohortbadges_memberships',
-        get_string('profileheading', 'local_cohortbadges'),
-        null,
-        null,
-        $content
-    );
-    $tree->add_node($node);
+    $viewer = $iscurrentuser ? 'self' : 'other';
+    \local_cohortbadges\local\profile_display::add_to_tree($tree, $user, $course, $viewer);
 }

@@ -24,8 +24,8 @@ use local_cohortbadges\local\membership_manager;
  * @package    local_cohortbadges
  * @copyright  2026 MIA Academy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_cohortbadges\local\membership_manager
  */
+#[\PHPUnit\Framework\Attributes\CoversClass(\local_cohortbadges\local\membership_manager::class)]
 final class membership_manager_test extends \advanced_testcase {
     /**
      * The cohort name is used by default.
@@ -75,6 +75,73 @@ final class membership_manager_test extends \advanced_testcase {
         $this->assertSame(
             'Students 2026 (ST26)',
             membership_manager::format_label('Students 2026', 'ST26')
+        );
+    }
+
+    /**
+     * Membership metadata supports safe permission checks for profile quick actions.
+     *
+     * @return void
+     */
+    public function test_memberships_include_context_and_component_metadata(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        require_once($CFG->dirroot . '/cohort/lib.php');
+
+        $userid = $this->getDataGenerator()->create_user()->id;
+        $contextid = \context_system::instance()->id;
+        $cohortid = cohort_add_cohort((object) [
+            'name' => 'Quick action cohort',
+            'contextid' => $contextid,
+        ]);
+        cohort_add_member($cohortid, $userid);
+
+        $memberships = membership_manager::get_memberships([$userid]);
+        $this->assertCount(1, $memberships[$userid]);
+        $this->assertSame($cohortid, $memberships[$userid][0]['id']);
+        $this->assertSame($contextid, $memberships[$userid][0]['contextid']);
+        $this->assertSame('', $memberships[$userid][0]['component']);
+    }
+    /**
+     * Cohort visibility is controlled by plugin settings.
+     *
+     * @return void
+     */
+    public function test_hidden_cohorts_follow_display_setting(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        require_once($CFG->dirroot . '/cohort/lib.php');
+
+        $userid = $this->getDataGenerator()->create_user()->id;
+        $contextid = \context_system::instance()->id;
+        $visibleid = cohort_add_cohort((object) [
+            'name' => 'Visible cohort',
+            'contextid' => $contextid,
+            'visible' => 1,
+        ]);
+        $hiddenid = cohort_add_cohort((object) [
+            'name' => 'Hidden cohort',
+            'contextid' => $contextid,
+            'visible' => 0,
+        ]);
+        cohort_add_member($visibleid, $userid);
+        cohort_add_member($hiddenid, $userid);
+
+        set_config('showhidden', 0, 'local_cohortbadges');
+        $memberships = membership_manager::get_memberships([$userid]);
+        $this->assertCount(1, $memberships[$userid]);
+        $this->assertSame($visibleid, $memberships[$userid][0]['id']);
+
+        set_config('showhidden', 1, 'local_cohortbadges');
+        $memberships = membership_manager::get_memberships([$userid]);
+        $this->assertCount(2, $memberships[$userid]);
+        $this->assertEqualsCanonicalizing(
+            [$visibleid, $hiddenid],
+            array_column($memberships[$userid], 'id')
         );
     }
 }
