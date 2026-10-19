@@ -37,5 +37,6 @@ function local_cohortbadges_myprofile_navigation(
     bool $iscurrentuser,
     $course
 ): void {
-    \local_cohortbadges\local\profile_display::add_to_tree($tree, $user, $course);
+    $viewer = $iscurrentuser ? 'self' : 'other';
+    \local_cohortbadges\local\profile_display::add_to_tree($tree, $user, $course, $viewer);
 }

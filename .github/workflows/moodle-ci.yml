@@ -98,6 +98,5 @@ jobs:
         run: moodle-plugin-ci phpunit --fail-on-warning ./plugin
 
       - name: PHP Mess Detector
-        continue-on-error: true
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpmd ./plugin

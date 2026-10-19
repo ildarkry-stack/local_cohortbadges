@@ -144,5 +144,4 @@ final class membership_manager_test extends \advanced_testcase {
             array_column($memberships[$userid], 'id')
         );
     }
-
 }

@@ -30,18 +30,20 @@ final class profile_display {
      * @param \core_user\output\myprofile\tree $tree Profile tree.
      * @param \stdClass $user Profile owner.
      * @param \stdClass|null $course Course, if any.
+     * @param string $viewer Self or other, from Moodle's profile callback.
      * @return void
      */
     public static function add_to_tree(
         \core_user\output\myprofile\tree $tree,
         \stdClass $user,
-        $course
+        $course,
+        string $viewer
     ): void {
         if (!self::is_enabled()) {
             return;
         }
 
-        $canview = self::can_view($user, $course);
+        $canview = self::can_view($viewer, $course);
         $canmanage = self::can_manage();
         if (!$canview && !$canmanage) {
             return;
@@ -89,14 +91,12 @@ final class profile_display {
     /**
      * Check profile viewing permissions without exposing other users' memberships.
      *
-     * @param \stdClass $user Profile owner.
+     * @param string $viewer Self or other.
      * @param \stdClass|null $course Course context when known.
      * @return bool
      */
-    private static function can_view(\stdClass $user, $course): bool {
-        global $USER;
-
-        if (!empty($USER->id) && (int) $USER->id === (int) $user->id) {
+    private static function can_view(string $viewer, $course): bool {
+        if ($viewer === 'self') {
             return true;
         }
         if ($course && !empty($course->id)) {
